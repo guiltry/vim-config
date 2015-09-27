@@ -16,11 +16,25 @@ call vundle#begin()
 
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'kien/ctrlp.vim'
 
 Plugin 'altercation/vim-colors-solarized'
 
 call vundle#end()            " required
 filetype plugin indent on    " required
+
+
+""""""""""""""""""""""""
+" Plugins
+""""""""""""""""""""""""
+
+" CtrlP
+let g:ctrlp_switch_buffer = 0
+let g:ctrlp_working_path_mode = 0
+if executable('ag')
+  let g:ctrlp_use_caching = 0
+  let g:ctrlp_user_command = 'ag %s -l -i --nocolor --nogroup -g ""'
+endif
 
 
 """"""""""""""""""""""""
@@ -59,6 +73,9 @@ set noerrorbells
 set visualbell
 set t_vb=
 
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
 
 """"""""""""""""""""""""
 " Searching
@@ -76,6 +93,8 @@ set tags=tags;/
 """"""""""""""""""""""""
 " Moving
 """"""""""""""""""""""""
+set scrolloff=5
+
 nnoremap j gj
 nnoremap k gk
 
@@ -88,7 +107,10 @@ inoremap <down> <nop>
 inoremap <left> <nop>
 inoremap <right> <nop>
 
-set scrolloff=5
+nmap <C-J> <C-W>j
+nmap <C-K> <C-W>k
+nmap <C-H> <C-W>h
+nmap <C-L> <C-W>l
 
 """"""""""""""""""""""""
 " Tricks
