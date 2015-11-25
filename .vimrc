@@ -18,6 +18,22 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'kien/ctrlp.vim'
 
+Plugin 'scrooloose/nerdtree'
+Plugin 'Xuyuanp/nerdtree-git-plugin'
+
+Plugin 'terryma/vim-multiple-cursors'
+Plugin 'sjl/gundo.vim'
+
+Plugin 'tomtom/tcomment_vim'
+Plugin 'easymotion/vim-easymotion'
+Plugin 'ervandew/supertab'
+Plugin 'majutsushi/tagbar'
+Plugin 'rking/ag.vim'
+
+Plugin 'elixir-lang/vim-elixir'
+Plugin 'tpope/vim-rails'
+Plugin 'slim-template/vim-slim'
+
 Plugin 'altercation/vim-colors-solarized'
 
 call vundle#end()            " required
@@ -35,6 +51,60 @@ if executable('ag')
   let g:ctrlp_use_caching = 0
   let g:ctrlp_user_command = 'ag %s -l -i --nocolor --nogroup -g ""'
 endif
+
+nnoremap <Leader>b :<C-U>CtrlPBuffer<CR>
+nnoremap <Leader>t :<C-U>CtrlP<CR>
+nnoremap <Leader>T :<C-U>CtrlPTag<CR>
+
+
+" NERDTree
+" Open NERDTree if no files specified at startup
+autocmd StdinReadPre * let s:std_in=1
+autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
+" NERDTreeGit
+let g:NERDTreeDirArrows = 1
+let g:NERDTreeDirArrowExpandable = '▸'
+let g:NERDTreeDirArrowCollapsible = '▾'
+
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
+
+nmap <leader>g :NERDTreeToggle<CR>
+nmap <leader>G :NERDTreeFind<CR>
+
+" Rails
+map <Leader>oc :Econtroller<Space>
+map <Leader>ov :Eview<Space>
+map <Leader>om :Emodel<Space>
+map <Leader>oh :Ehelper<Space>
+map <Leader>oj :Ejavascript<Space>
+map <Leader>os :Estylesheet<Space>
+map <Leader>oi :Eintegration<Space>
+
+" Tagbar
+let g:tagbar_autofocus = 1
+map <Leader>rt :!ctags --extra=+f -R *<CR><CR>
+map <Leader>. :TagbarToggle<CR>
+
+" Ag
+nmap g/ :Ag!<space>
+nmap g* :Ag! -w <C-R><C-W><space>
+nmap ga :AgAdd!<space>
+nmap gn :cnext<CR>
+nmap gp :cprev<CR>
+nmap gq :ccl<CR>
+nmap gl :cwindow<CR>
+
 
 
 """"""""""""""""""""""""
@@ -54,6 +124,7 @@ set expandtab
 set encoding=utf-8 nobomb
 set autoindent
 set shiftwidth=2
+set backspace=indent,eol,start
 
 
 """"""""""""""""""""""""
@@ -90,6 +161,7 @@ nnoremap <leader><space> :nohlsearch<CR>
 
 set tags=tags;/
 
+
 """"""""""""""""""""""""
 " Moving
 """"""""""""""""""""""""
@@ -112,6 +184,10 @@ nmap <C-K> <C-W>k
 nmap <C-H> <C-W>h
 nmap <C-L> <C-W>l
 
+nnoremap H gT
+nnoremap L gt
+
+
 """"""""""""""""""""""""
 " Tricks
 """"""""""""""""""""""""
@@ -120,6 +196,16 @@ map N Nzz
 map <C-o> <C-o>zz
 map <C-i> <C-i>zz
 nnoremap ; :
+
+" Strip trailing whitespace (,ss)
+function! StripWhitespace()
+  let save_cursor = getpos(".")
+  let old_query = getreg('/')
+  :%s/\s\+$//e
+  call setpos('.', save_cursor)
+  call setreg('/', old_query)
+endfunction
+noremap <leader>c :call StripWhitespace()<CR>
 
 " PHP
 imap <C-l> ->
