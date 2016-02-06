@@ -126,6 +126,8 @@ let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
 """"""""""""""""""""""""
 set background=dark
 colorscheme solarized
+let g:solarized_termcolors=256
+set t_Co=256 
 syntax enable
 
 
