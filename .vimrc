@@ -27,7 +27,6 @@ Plugin 'sjl/gundo.vim'
 Plugin 'tomtom/tcomment_vim'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'ervandew/supertab'
-Plugin 'majutsushi/tagbar'
 Plugin 'jiangmiao/auto-pairs'
 Plugin 'rking/ag.vim'
 Plugin 'tpope/vim-fugitive'
@@ -59,14 +58,14 @@ if executable('ag')
 endif
 
 nnoremap <Leader>b :<C-U>CtrlPBuffer<CR>
-nnoremap <Leader>t :<C-U>CtrlP<CR>
-nnoremap <Leader>T :<C-U>CtrlPTag<CR>
+nnoremap <Leader>p :<C-U>CtrlP<CR>
 
 
 " NERDTree
 " Open NERDTree if no files specified at startup
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+
 
 " NERDTreeGit
 let g:NERDTreeDirArrows = 1
@@ -88,39 +87,24 @@ let g:NERDTreeIndicatorMapCustom = {
 nmap <leader>g :NERDTreeToggle<CR>
 nmap <leader>G :NERDTreeFind<CR>
 
-" Rails
-map <Leader>oc :Econtroller<Space>
-map <Leader>ov :Eview<Space>
-map <Leader>om :Emodel<Space>
-map <Leader>oh :Ehelper<Space>
-map <Leader>oj :Ejavascript<Space>
-map <Leader>os :Estylesheet<Space>
-map <Leader>oi :Eintegration<Space>
-
-" Tagbar
-let g:tagbar_autofocus = 1
+" Ctags
 map <Leader>rt :!ctags --extra=+f -R *<CR><CR>
-map <Leader>. :TagbarToggle<CR>
 
 " Ag
 nmap g/ :Ag!<space>
 nmap g* :Ag! -w <C-R><C-W><space>
-nmap ga :AgAdd!<space>
-nmap gn :cnext<CR>
-nmap gp :cprev<CR>
-nmap gq :ccl<CR>
-nmap gl :cwindow<CR>
 
 " Vim Snippets
 " http://stackoverflow.com/a/22253548/927748
-let g:SuperTabDefaultCompletionType    = '<C-n>'
-let g:SuperTabCrMapping                = 0
-let g:UltiSnipsExpandTrigger           = "<tab>"
-let g:UltiSnipsJumpForwardTrigger      = '<tab>'
-let g:UltiSnipsJumpBackwardTrigger     = "<s-tab>"
-let g:UltiSnipsEditSplit               = "vertical"
-let g:ycm_key_list_select_completion   = ['<C-j>', '<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
+" let g:SuperTabDefaultCompletionType    = '<C-n>'
+" let g:SuperTabCrMapping                = 0
+" let g:UltiSnipsExpandTrigger           = "<tab>"
+" let g:UltiSnipsJumpForwardTrigger      = '<tab>'
+" let g:UltiSnipsJumpBackwardTrigger     = "<s-tab>"
+" let g:UltiSnipsEditSplit               = "vertical"
+" let g:ycm_key_list_select_completion   = ['<C-j>', '<C-n>', '<Down>']
+" let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
+
 
 """"""""""""""""""""""""
 " Colors
@@ -128,7 +112,7 @@ let g:ycm_key_list_previous_completion = ['<C-k>', '<C-p>', '<Up>']
 set background=dark
 colorscheme solarized
 let g:solarized_termcolors=256
-set t_Co=256 
+set t_Co=256
 syntax enable
 
 
@@ -174,7 +158,7 @@ set ignorecase
 set smartcase
 
 " turn off search highlight
-nnoremap <leader><space> :nohlsearch<CR> 
+nnoremap <CR> :nohlsearch<CR>
 
 set tags=tags;/
 
@@ -213,8 +197,9 @@ map N Nzz
 map <C-o> <C-o>zz
 map <C-i> <C-i>zz
 nnoremap ; :
+map <Space> \
 
-" Strip trailing whitespace (,ss)
+""" Strip trailing whitespace (,ss)
 function! StripWhitespace()
   let save_cursor = getpos(".")
   let old_query = getreg('/')
@@ -223,6 +208,69 @@ function! StripWhitespace()
   call setreg('/', old_query)
 endfunction
 noremap <leader>c :call StripWhitespace()<CR>
+
+""" Switch to rspec, and vice versa
+function! SwitchFile()
+  let current_file = expand('%')
+  let other_file = ''
+
+  if IsInApp(current_file)
+    let other_file = GetSpecFile(current_file)
+  elseif IsInSpec(current_file)
+    let other_file = GetAppFile(current_file)
+  end
+
+  if other_file != ''
+    exec ':e ' . other_file
+  end
+endfunction
+
+function! IsInApp(filename)
+  return match(a:filename, '^app/') == 0
+endfunction
+
+function! IsInSpec(filename)
+  return match(a:filename, '^spec/') == 0
+endfunction
+
+function! GetAppFile(filename)
+  let other_file = substitute(a:filename, '^spec/', 'app/', '')
+  let other_file = substitute(other_file, '_spec\.rb$', '.rb', '')
+
+  return other_file
+endfunction
+
+function! GetSpecFile(filename)
+  let other_file = substitute(a:filename, '^app/', 'spec/', '')
+  let other_file = substitute(other_file, '\.rb$', '_spec.rb', '')
+
+  return other_file
+endfunction
+
+nnoremap <leader>. :call SwitchFile()<cr>
+
+""" Run rspec
+function! RunRspecFile(use_spring)
+  let current_file = expand('%')
+  let test_file = ''
+
+  if IsInApp(current_file)
+    let test_file = GetSpecFile(current_file)
+  elseif IsInSpec(current_file)
+    let test_file = current_file
+  end
+
+  if test_file != ''
+    if a:use_spring
+      exec ':!spring rspec ' . test_file
+    else
+      exec ':!rspec ' . test_file
+    end
+  end
+endfunction
+
+nnoremap <leader>t :call RunRspecFile(0)<cr>
+nnoremap <leader>T :call RunRspecFile(1)<cr>
 
 imap <C-l> ->
 
