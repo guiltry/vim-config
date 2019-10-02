@@ -1,0 +1,9 @@
+[
+    { "keys": ["command+shift+r"], "command": "reveal_in_side_bar"},
+    { "keys": ["command+shift+t"], "command": "golang_build",
+    	"args": {
+    		"task": "run",
+    		"flags": ["-v"],
+    	}
+    }
+]
