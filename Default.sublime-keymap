@@ -1,3 +1,4 @@
+// https://github.com/golang/sublime-build/blob/master/docs/commands.md
 [
     { "keys": ["command+shift+r"], "command": "reveal_in_side_bar"},
     { "keys": ["command+shift+t"], "command": "golang_build",
